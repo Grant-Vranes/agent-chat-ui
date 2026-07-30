@@ -61,7 +61,7 @@ export function ChatWindow() {
       {/* Main area */}
       <div className="flex flex-1 flex-col">
         {/* Top bar */}
-        <NavBar>
+        <NavBar chatId={currentChatId}>
           {!sidebarOpen && (
             <Button
               variant="ghost"
@@ -81,8 +81,8 @@ export function ChatWindow() {
           <div className="mx-auto max-w-3xl">
             {messages.length === 0 && !isLoading ? (
               <div className="mt-[25vh] text-center text-muted-foreground">
-                <p className="text-2xl font-semibold">Support Bot</p>
-                <p>How can I help you today?</p>
+                <p className="text-2xl font-semibold">Logistics Consultant</p>
+                <p>Describe your logistics scenario to get a tailored proposal.</p>
               </div>
             ) : null}
             <MessageList messages={messages} isLoading={isLoading} />

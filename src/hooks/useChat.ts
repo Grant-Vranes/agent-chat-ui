@@ -51,7 +51,7 @@ export function useChat(): UseChatReturn {
     accumulatedRef.current = "";
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-    const url = `${apiUrl}/ai/assistant_app/chat/sse?message=${encodeURIComponent(content)}&chatId=${encodeURIComponent(chatId)}`;
+    const url = `${apiUrl}/api/logistics/chat/sse?message=${encodeURIComponent(content)}&chatId=${encodeURIComponent(chatId)}`;
 
     const es = new EventSource(url);
     eventSourceRef.current = es;

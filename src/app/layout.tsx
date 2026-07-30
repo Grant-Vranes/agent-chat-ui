@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Support Bot",
-  description: "AI-powered customer support chatbot",
+  title: "Logistics Consultant",
+  description: "AI-powered logistics proposal analyst",
 };
 
 export default function RootLayout({
