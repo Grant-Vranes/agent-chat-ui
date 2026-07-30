@@ -87,9 +87,7 @@ export function UploadPanel() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Document Upload</h1>
-
+    <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         {(
           [

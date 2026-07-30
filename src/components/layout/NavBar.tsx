@@ -1,15 +1,24 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Upload, Download } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { UploadPanel } from "@/components/documents/UploadPanel";
 
 export function NavBar({ children, chatId }: { children?: React.ReactNode; chatId?: string | null }) {
   const pathname = usePathname();
   const [exporting, setExporting] = useState(false);
+  const [docOpen, setDocOpen] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -42,18 +51,25 @@ export function NavBar({ children, chatId }: { children?: React.ReactNode; chatI
     <nav className="flex items-center justify-between border-b px-4 py-2">
       <div className="flex items-center gap-2">
         {children}
-        <Link href="/">
-          <Button variant={pathname === "/" ? "secondary" : "ghost"} size="sm">
-            <MessageSquare className="mr-1 h-4 w-4" />
-            Chat
-          </Button>
-        </Link>
-        <Link href="/documents">
-          <Button variant={pathname === "/documents" ? "secondary" : "ghost"} size="sm">
-            <Upload className="mr-1 h-4 w-4" />
-            Documents
-          </Button>
-        </Link>
+        <Button variant={pathname === "/" ? "secondary" : "ghost"} size="sm" onClick={() => window.location.href = "/"}>
+          <MessageSquare className="mr-1 h-4 w-4" />
+          Chat
+        </Button>
+        <Dialog open={docOpen} onOpenChange={setDocOpen}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <Upload className="mr-1 h-4 w-4" />
+              Documents
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Document Upload</DialogTitle>
+              <DialogDescription>Upload documents to the knowledge base.</DialogDescription>
+            </DialogHeader>
+            <UploadPanel />
+          </DialogContent>
+        </Dialog>
         {chatId && (
           <div className="flex items-center gap-1 ml-2 border-l pl-2">
             <Button
