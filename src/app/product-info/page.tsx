@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { MessageSquare, ShoppingCart, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { NavBar } from "@/components/layout/NavBar";
 
 export default function ProductInfoPage() {
   const [input, setInput] = useState("");
@@ -33,30 +32,7 @@ export default function ProductInfoPage() {
 
   return (
     <div className="min-h-screen">
-      <nav className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Button variant="ghost" size="sm">
-              <MessageSquare className="mr-1 h-4 w-4" />
-              Chat
-            </Button>
-          </Link>
-          <Link href="/documents">
-            <Button variant="ghost" size="sm">
-              <Upload className="mr-1 h-4 w-4" />
-              Documents
-            </Button>
-          </Link>
-          <Link href="/product-info">
-            <Button variant="secondary" size="sm">
-              <ShoppingCart className="mr-1 h-4 w-4" />
-              Product Info
-            </Button>
-          </Link>
-        </div>
-        <h1 className="text-lg font-semibold">Support Bot</h1>
-        <div className="w-20" />
-      </nav>
+      <NavBar />
       <main className="mx-auto max-w-2xl space-y-6 p-6">
         <h1 className="text-2xl font-semibold">Product Info Extraction</h1>
 

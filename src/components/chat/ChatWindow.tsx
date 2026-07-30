@@ -8,6 +8,7 @@ import { ChatInput } from "./ChatInput";
 import { Button } from "@/components/ui/button";
 import { MessageSquarePlus, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { motion } from "framer-motion";
+import { NavBar } from "@/components/layout/NavBar";
 
 export function ChatWindow() {
   const {
@@ -60,24 +61,20 @@ export function ChatWindow() {
       {/* Main area */}
       <div className="flex flex-1 flex-col">
         {/* Top bar */}
-        <div className="flex items-center justify-between border-b px-4 py-2">
-          <div className="flex items-center gap-2">
-            {!sidebarOpen && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <PanelRightOpen className="h-4 w-4" />
-              </Button>
-            )}
-            <Button variant="ghost" size="icon" onClick={newSession}>
-              <MessageSquarePlus className="h-5 w-5" />
+        <NavBar>
+          {!sidebarOpen && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <PanelRightOpen className="h-4 w-4" />
             </Button>
-          </div>
-          <h1 className="text-lg font-semibold">Support Bot</h1>
-          <div className="w-10" />
-        </div>
+          )}
+          <Button variant="ghost" size="icon" onClick={newSession}>
+            <MessageSquarePlus className="h-5 w-5" />
+          </Button>
+        </NavBar>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-8">
