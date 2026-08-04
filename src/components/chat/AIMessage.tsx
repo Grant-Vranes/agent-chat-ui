@@ -3,7 +3,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useState, useCallback } from "react";
-import { Copy, Check, ExternalLink } from "lucide-react";
+import { Copy, Check, Download, ExternalLink } from "lucide-react";
 import type { Components } from "react-markdown";
 
 function preprocessMarkdown(raw: string): string {
@@ -127,14 +127,65 @@ const components: Components = {
   },
 };
 
-export function AIMessage({ content }: { content: string }) {
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export function AIMessage({ content, timestamp }: { content: string; timestamp: number }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [content]);
+
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "message.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [content]);
+
   if (!content) return null;
+
   return (
-    <div className="mr-auto flex w-full items-start gap-2">
-      <div className="prose prose-sm max-w-none py-1 dark:prose-invert">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-          {preprocessMarkdown(content)}
-        </ReactMarkdown>
+    <div className="group flex w-full flex-col items-start gap-1.5">
+      <div className="flex items-start gap-3">
+        <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+          AI
+        </div>
+        <div className="prose prose-sm max-w-none py-0.5 dark:prose-invert">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+            {preprocessMarkdown(content)}
+          </ReactMarkdown>
+        </div>
+      </div>
+      <div className="ml-13 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="text-xs text-muted-foreground/60">{formatTime(timestamp)}</span>
+        <button
+          onClick={handleCopy}
+          className="flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+          aria-label={copied ? "Copied" : "Copy message"}
+        >
+          {copied ? <Check className="size-3 text-green-500" /> : <Copy className="size-3" />}
+        </button>
+        <button
+          onClick={handleDownload}
+          className="flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+          aria-label="Download message"
+        >
+          <Download className="size-3" />
+        </button>
       </div>
     </div>
   );

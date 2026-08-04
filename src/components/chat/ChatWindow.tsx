@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useChat } from "@/hooks/useChat";
 import { ChatHistory } from "./ChatHistory";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { Button } from "@/components/ui/button";
 import { MessageSquarePlus, PanelRightClose, PanelRightOpen } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { NavBar } from "@/components/layout/NavBar";
 
 export function ChatWindow() {
@@ -25,72 +25,76 @@ export function ChatWindow() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  useEffect(() => {
-    // no-op: sessions load from useChat hook on mount
-  }, []);
-
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      {/* Sidebar */}
-      <motion.div
-        className="h-full border-r bg-background"
-        style={{ width: 300 }}
-        animate={{ x: sidebarOpen ? 0 : -300 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      >
-        <div className="flex h-full flex-col" style={{ width: 300 }}>
-          <div className="flex items-center justify-between border-b p-3">
-            <h2 className="text-sm font-semibold">History</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <PanelRightClose className="h-4 w-4" />
-            </Button>
-          </div>
-          <ChatHistory
-            sessions={sessions}
-            currentChatId={currentChatId}
-            onSelect={loadSession}
-            onDelete={removeSession}
-          />
-        </div>
-      </motion.div>
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.aside
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="h-full border-r border-sidebar-border bg-sidebar shadow-inner-right"
+            style={{ width: 300, flexShrink: 0 }}
+          >
+            <div className="flex h-full flex-col">
+              <div className="flex items-center justify-between border-b border-sidebar-border px-4 py-3">
+                <h2 className="text-sm font-semibold text-sidebar-foreground">History</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSidebarOpen(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <PanelRightClose className="h-4 w-4" />
+                </Button>
+              </div>
+              <ChatHistory
+                sessions={sessions}
+                currentChatId={currentChatId}
+                onSelect={loadSession}
+                onDelete={removeSession}
+              />
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
-      {/* Main area */}
-      <div className="flex flex-1 flex-col">
-        {/* Top bar */}
+      <div className="flex flex-1 flex-col min-w-0">
         <NavBar chatId={currentChatId}>
           {!sidebarOpen && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(true)}
+              className="text-muted-foreground hover:text-foreground"
             >
               <PanelRightOpen className="h-4 w-4" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={newSession}>
+          <Button variant="ghost" size="icon" onClick={newSession} className="text-muted-foreground hover:text-foreground">
             <MessageSquarePlus className="h-5 w-5" />
           </Button>
         </NavBar>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-8">
-          <div className="mx-auto max-w-3xl">
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-3xl px-4 py-8">
             {messages.length === 0 && !isLoading ? (
-              <div className="mt-[25vh] text-center text-muted-foreground">
-                <p className="text-2xl font-semibold">Logistics Consultant</p>
-                <p>Describe your logistics scenario to get a tailored proposal.</p>
+              <div className="mt-[20vh] text-center">
+                <h1 className="font-display text-4xl font-normal text-primary">
+                  Logistics Consultant
+                </h1>
+                <div className="mx-auto mt-4 h-px w-16 bg-border" />
+                <p className="mt-4 text-sm text-muted-foreground">
+                  Describe your logistics scenario to get a tailored proposal.
+                </p>
               </div>
             ) : null}
             <MessageList messages={messages} isLoading={isLoading} />
           </div>
         </div>
 
-        {/* Input */}
-        <div className="border-t p-4">
+        <div className="border-t border-border bg-background px-4 py-4">
           <div className="mx-auto max-w-3xl">
             <ChatInput onSend={sendMessage} isLoading={isLoading} onStop={stop} />
           </div>

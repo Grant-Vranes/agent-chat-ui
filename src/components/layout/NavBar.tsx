@@ -48,17 +48,17 @@ export function NavBar({ children, chatId }: { children?: React.ReactNode; chatI
   };
 
   return (
-    <nav className="flex items-center justify-between border-b px-4 py-2">
+    <nav className="flex items-center justify-between border-b border-border px-4 py-3 shadow-card">
       <div className="flex items-center gap-2">
         {children}
         <Button variant={pathname === "/" ? "secondary" : "ghost"} size="sm" onClick={() => window.location.href = "/"}>
-          <MessageSquare className="mr-1 h-4 w-4" />
+          <MessageSquare className="mr-1.5 h-4 w-4" />
           Chat
         </Button>
         <Dialog open={docOpen} onOpenChange={setDocOpen}>
           <DialogTrigger asChild>
             <Button variant="ghost" size="sm">
-              <Upload className="mr-1 h-4 w-4" />
+              <Upload className="mr-1.5 h-4 w-4" />
               Documents
             </Button>
           </DialogTrigger>
@@ -71,14 +71,14 @@ export function NavBar({ children, chatId }: { children?: React.ReactNode; chatI
           </DialogContent>
         </Dialog>
         {chatId && (
-          <div className="flex items-center gap-1 ml-2 border-l pl-2">
+          <div className="ml-2 flex items-center gap-1 border-l border-border pl-2">
             <Button
               variant="ghost"
               size="sm"
               disabled={exporting}
               onClick={() => handleExport("markdown")}
             >
-              <Download className="mr-1 h-4 w-4" />
+              <Download className="mr-1.5 h-4 w-4" />
               MD
             </Button>
             <Button
@@ -87,13 +87,13 @@ export function NavBar({ children, chatId }: { children?: React.ReactNode; chatI
               disabled={exporting}
               onClick={() => handleExport("docx")}
             >
-              <Download className="mr-1 h-4 w-4" />
+              <Download className="mr-1.5 h-4 w-4" />
               DOCX
             </Button>
           </div>
         )}
       </div>
-      <h1 className="text-lg font-semibold">Logistics Consultant</h1>
+      <h1 className="font-display text-lg italic text-primary">Logistics Consultant</h1>
       <div className="w-20" />
     </nav>
   );

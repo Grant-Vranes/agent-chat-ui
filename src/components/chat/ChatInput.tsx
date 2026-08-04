@@ -31,21 +31,28 @@ export function ChatInput({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-2">
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Type your message..."
-        className="field-sizing-content flex-1 resize-none rounded-2xl border p-3 outline-none ring-0 focus:ring-0"
-        rows={2}
-      />
+    <form onSubmit={handleSubmit} className="flex items-end gap-3">
+      <div className="relative flex-1">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type your message..."
+          className="field-sizing-content w-full resize-none rounded-2xl border border-input bg-secondary/50 px-4 py-3 pr-12 text-sm outline-none ring-0 transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          rows={2}
+        />
+      </div>
       {isLoading ? (
-        <Button type="button" onClick={onStop} variant="outline" size="icon">
+        <Button type="button" onClick={onStop} variant="outline" size="icon" className="size-10 shrink-0 rounded-xl">
           <LoaderCircle className="h-4 w-4 animate-spin" />
         </Button>
       ) : (
-        <Button type="submit" disabled={!input.trim()} size="icon">
+        <Button
+          type="submit"
+          disabled={!input.trim()}
+          size="icon"
+          className="size-10 shrink-0 rounded-xl"
+        >
           <Send className="h-4 w-4" />
         </Button>
       )}

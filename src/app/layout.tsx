@@ -1,12 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import React from "react";
 
-const inter = Inter({
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  preload: true,
+  display: "swap",
+  variable: "--font-display",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   preload: true,
   display: "swap",
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -20,10 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {children}
-      </body>
+    <html lang="en" className={`${instrumentSerif.variable} ${plusJakartaSans.variable}`}>
+      <body className="font-body antialiased">{children}</body>
     </html>
   );
 }

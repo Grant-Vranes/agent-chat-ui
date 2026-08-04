@@ -16,23 +16,30 @@ export function ChatHistory({
   onDelete: (id: string) => void;
 }) {
   return (
-    <div className="flex h-full w-full flex-col gap-2 overflow-y-auto p-2">
+    <div className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
       {sessions.map((s) => (
-        <div key={s.id} className="flex items-center gap-1">
-          <Button
-            variant={s.id === currentChatId ? "secondary" : "ghost"}
-            className="flex-1 justify-start truncate text-left text-sm"
+        <div
+          key={s.id}
+          className={`group flex items-center gap-1 rounded-lg px-3 py-2 transition-colors hover:bg-secondary ${
+            s.id === currentChatId ? "bg-secondary" : ""
+          }`}
+        >
+          {s.id === currentChatId && (
+            <div className="-ml-3 mr-2 h-5 w-0.5 shrink-0 rounded-full bg-primary" />
+          )}
+          <button
+            className="flex-1 truncate text-left text-sm text-foreground/80 transition-colors hover:text-foreground"
             onClick={() => onSelect(s.id)}
           >
             {s.title || "New chat"}
-          </Button>
+          </button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0"
+            className="size-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
             onClick={() => onDelete(s.id)}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
           </Button>
         </div>
       ))}
