@@ -2,9 +2,26 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Copy, Check, Download, ExternalLink } from "lucide-react";
 import type { Components } from "react-markdown";
+
+function extractHeadingText(children: React.ReactNode): string {
+  let text = "";
+  React.Children.forEach(children, (child) => {
+    if (typeof child === "string") text += child;
+    else if (typeof child === "number") text += String(child);
+  });
+  return text.trim();
+}
+
+function headingId(msgId: string, text: string): string {
+  const slug = text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-]/g, "");
+  return `heading-${msgId}-${slug}`;
+}
 
 function preprocessMarkdown(raw: string): string {
   return raw
@@ -136,8 +153,22 @@ function formatTime(ts: number): string {
   });
 }
 
-export function AIMessage({ content, timestamp }: { content: string; timestamp: number }) {
+export function AIMessage({ content, timestamp, messageId }: { content: string; timestamp: number; messageId: string }) {
   const [copied, setCopied] = useState(false);
+
+  const headingComponents = useMemo<Components>(() => ({
+    ...components,
+    h2: ({ children, ...props }) => {
+      const text = extractHeadingText(children);
+      const id = text ? headingId(messageId, text) : undefined;
+      return <h2 id={id} className="scroll-mt-20" {...props}>{children}</h2>;
+    },
+    h3: ({ children, ...props }) => {
+      const text = extractHeadingText(children);
+      const id = text ? headingId(messageId, text) : undefined;
+      return <h3 id={id} className="scroll-mt-20" {...props}>{children}</h3>;
+    },
+  }), [messageId]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(content).then(() => {
@@ -165,7 +196,7 @@ export function AIMessage({ content, timestamp }: { content: string; timestamp: 
           AI
         </div>
         <div className="prose prose-sm max-w-none py-0.5 dark:prose-invert">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={headingComponents}>
             {preprocessMarkdown(content)}
           </ReactMarkdown>
         </div>

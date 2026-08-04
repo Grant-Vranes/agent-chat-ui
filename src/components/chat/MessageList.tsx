@@ -25,6 +25,7 @@ export function MessageList({
         {messages.map((msg) => (
           <motion.div
             key={msg.id}
+            id={`msg-${msg.id}`}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -33,7 +34,7 @@ export function MessageList({
             {msg.role === "user" ? (
               <HumanMessage content={msg.content} timestamp={msg.timestamp} />
             ) : (
-              <AIMessage content={msg.content} timestamp={msg.timestamp} />
+              <AIMessage content={msg.content} timestamp={msg.timestamp} messageId={msg.id} />
             )}
           </motion.div>
         ))}

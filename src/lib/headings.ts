@@ -14,6 +14,12 @@ export interface OverviewItem {
   msgId: string;
 }
 
+export interface RoundGroup {
+  roundIndex: number;
+  userItem: OverviewItem;
+  children: OverviewItem[];
+}
+
 function headingId(msgId: string, text: string): string {
   const slug = text
     .toLowerCase()
@@ -39,33 +45,44 @@ export function extractHeadings(content: string, msgId: string): HeadingItem[] {
   return items;
 }
 
-export function getOverview(messages: ChatMessage[]): OverviewItem[] {
-  const items: OverviewItem[] = [];
-  for (const msg of messages) {
-    if (msg.role === "user") {
-      const text = msg.content.length > 50 ? msg.content.slice(0, 50) + "…" : msg.content;
-      items.push({
-        id: `msg-${msg.id}`,
-        text,
-        type: "user",
-        msgId: msg.id,
-      });
-    } else {
-      const headings = extractHeadings(msg.content, msg.id);
+export function getRoundGroups(messages: ChatMessage[]): RoundGroup[] {
+  const groups: RoundGroup[] = [];
+  let roundIndex = 0;
+
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    if (msg.role !== "user") continue;
+
+    const userText = msg.content.length > 80 ? msg.content.slice(0, 80) + "…" : msg.content;
+    const userItem: OverviewItem = {
+      id: `msg-${msg.id}`,
+      text: userText,
+      type: "user",
+      msgId: msg.id,
+    };
+
+    const children: OverviewItem[] = [];
+
+    const nextMsg = messages[i + 1];
+    if (nextMsg?.role === "assistant") {
+      const headings = extractHeadings(nextMsg.content, nextMsg.id);
       if (headings.length > 0) {
         for (const h of headings) {
-          items.push({ ...h, type: "ai-heading" } as OverviewItem);
+          children.push({ id: h.id, text: h.text, type: "ai-heading", msgId: h.msgId });
         }
       } else {
-        const text = msg.content.length > 80 ? msg.content.slice(0, 80) + "…" : msg.content;
-        items.push({
-          id: `msg-${msg.id}`,
-          text,
+        const aiText = nextMsg.content.length > 80 ? nextMsg.content.slice(0, 80) + "…" : nextMsg.content;
+        children.push({
+          id: `msg-${nextMsg.id}`,
+          text: aiText,
           type: "ai-summary",
-          msgId: msg.id,
+          msgId: nextMsg.id,
         });
       }
     }
+
+    groups.push({ roundIndex: roundIndex++, userItem, children });
   }
-  return items;
+
+  return groups;
 }

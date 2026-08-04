@@ -5,6 +5,7 @@ import { useChat } from "@/hooks/useChat";
 import { ChatHistory } from "./ChatHistory";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
+import { ConversationOverview } from "./ConversationOverview";
 import { Button } from "@/components/ui/button";
 import { MessageSquarePlus, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +25,7 @@ export function ChatWindow() {
   } = useChat();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [overviewOpen, setOverviewOpen] = useState(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
@@ -100,6 +102,12 @@ export function ChatWindow() {
           </div>
         </div>
       </div>
+
+      <ConversationOverview
+        messages={messages}
+        isOpen={overviewOpen}
+        onToggle={() => setOverviewOpen((v) => !v)}
+      />
     </div>
   );
 }
