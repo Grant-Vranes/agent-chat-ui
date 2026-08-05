@@ -9,9 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 export function MessageList({
   messages,
   isLoading,
+  stopped,
 }: {
   messages: ChatMessage[];
   isLoading: boolean;
+  stopped: boolean;
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +41,19 @@ export function MessageList({
           </motion.div>
         ))}
       </AnimatePresence>
+      {stopped && !isLoading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex justify-center"
+        >
+          <div className="flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5">
+            <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+            <span className="text-[11px] text-muted-foreground/60">Response interrupted</span>
+            <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+          </div>
+        </motion.div>
+      )}
       {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}

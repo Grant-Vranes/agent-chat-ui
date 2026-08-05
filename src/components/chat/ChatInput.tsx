@@ -17,13 +17,17 @@ export function ChatInput({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (isLoading) {
+      onStop();
+      return;
+    }
     if (!input.trim()) return;
     onSend(input.trim());
     setInput("");
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isLoading) {
       e.preventDefault();
       const form = (e.target as HTMLElement).closest("form");
       form?.requestSubmit();
@@ -37,25 +41,25 @@ export function ChatInput({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type your message..."
-          className="field-sizing-content w-full resize-none rounded-2xl border border-input bg-secondary/50 px-4 py-3 pr-12 text-sm outline-none ring-0 transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          placeholder={isLoading ? "AI is responding..." : "Type your message..."}
+          className="field-sizing-content w-full resize-none rounded-2xl border border-input bg-secondary/50 px-4 py-3 pr-12 text-sm outline-none ring-0 transition-colors placeholder:text-muted-foreground/60 focus:border-primry focus:ring-2 focus:ring-primary/20"
           rows={2}
+          disabled={isLoading}
         />
       </div>
-      {isLoading ? (
-        <Button type="button" onClick={onStop} variant="outline" size="icon" className="size-10 shrink-0 rounded-xl">
+      <Button
+        type="submit"
+        disabled={!isLoading && !input.trim()}
+        size="icon"
+        className="size-10 shrink-0 rounded-xl transition-all"
+        variant={isLoading ? "destructive" : "default"}
+      >
+        {isLoading ? (
           <LoaderCircle className="h-4 w-4 animate-spin" />
-        </Button>
-      ) : (
-        <Button
-          type="submit"
-          disabled={!input.trim()}
-          size="icon"
-          className="size-10 shrink-0 rounded-xl"
-        >
+        ) : (
           <Send className="h-4 w-4" />
-        </Button>
-      )}
+        )}
+      </Button>
     </form>
   );
 }

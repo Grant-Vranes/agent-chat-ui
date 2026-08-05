@@ -72,3 +72,13 @@ export function createSession(id: string, firstMessage: string): ChatSession {
     updatedAt: Date.now(),
   };
 }
+
+export function renameSession(id: string, newTitle: string) {
+  const all = readSessions();
+  const session = all.find((s) => s.id === id);
+  if (session) {
+    session.title = newTitle;
+    session.updatedAt = Date.now();
+    writeSessions(all);
+  }
+}

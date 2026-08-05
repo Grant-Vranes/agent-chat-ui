@@ -1,10 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { ChatMessage, ChatSession, getSessions, getSession, saveSession, deleteSession as deleteStorageSession, createSession, PptOutline } from "@/lib/storage";
+import { ChatMessage, ChatSession, getSessions, getSession, saveSession, deleteSession as deleteStorageSession, createSession, renameSession as renameStorageSession, PptOutline } from "@/lib/storage";
 
 export interface UseChatReturn {
   messages: ChatMessage[];
   isLoading: boolean;
+  stopped: boolean;
   error: string | null;
   sendMessage: (content: string) => void;
   stop: () => void;
@@ -13,6 +14,7 @@ export interface UseChatReturn {
   sessions: ChatSession[];
   newSession: () => void;
   removeSession: (id: string) => void;
+  renameSession: (id: string, newTitle: string) => void;
   pptOutline: PptOutline | null;
   hasOutline: boolean;
 }
@@ -30,6 +32,7 @@ export function useChat(): UseChatReturn {
 
   const [pptOutline, setPptOutline] = useState<PptOutline | null>(null);
   const [hasOutline, setHasOutline] = useState(false);
+  const [stopped, setStopped] = useState(false);
   const pptOutlineRef = useRef<PptOutline | null>(null);
 
   useEffect(() => {
@@ -50,6 +53,7 @@ export function useChat(): UseChatReturn {
 
   const sendMessage = useCallback((content: string) => {
     setError(null);
+    setStopped(false);
     const chatId = chatIdRef.current || uuidv4();
     chatIdRef.current = chatId;
     setCurrentChatId(chatId);
@@ -121,6 +125,7 @@ export function useChat(): UseChatReturn {
   const stop = useCallback(() => {
     eventSourceRef.current?.close();
     setIsLoading(false);
+    setStopped(true);
   }, []);
 
   const loadSession = useCallback((chatId: string) => {
@@ -156,9 +161,15 @@ export function useChat(): UseChatReturn {
     refreshSessions();
   }, [currentChatId, newSession, refreshSessions]);
 
+  const renameSession = useCallback((id: string, newTitle: string) => {
+    renameStorageSession(id, newTitle);
+    refreshSessions();
+  }, [refreshSessions]);
+
   return {
     messages,
     isLoading,
+    stopped,
     error,
     sendMessage,
     stop,
@@ -167,6 +178,7 @@ export function useChat(): UseChatReturn {
     sessions,
     newSession,
     removeSession,
+    renameSession,
     pptOutline,
     hasOutline,
   };

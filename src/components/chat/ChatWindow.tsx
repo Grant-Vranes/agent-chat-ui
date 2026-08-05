@@ -17,6 +17,7 @@ export function ChatWindow() {
   const {
     messages,
     isLoading,
+    stopped,
     sendMessage,
     stop,
     loadSession,
@@ -24,6 +25,7 @@ export function ChatWindow() {
     sessions,
     newSession,
     removeSession,
+    renameSession,
     pptOutline,
     hasOutline,
   } = useChat();
@@ -71,6 +73,7 @@ export function ChatWindow() {
                 currentChatId={currentChatId}
                 onSelect={loadSession}
                 onDelete={removeSession}
+                onRename={renameSession}
               />
             </div>
           </motion.aside>
@@ -119,7 +122,7 @@ export function ChatWindow() {
                 </p>
               </div>
             ) : null}
-            <MessageList messages={messages} isLoading={isLoading} />
+            <MessageList messages={messages} isLoading={isLoading} stopped={stopped} />
           </div>
         </div>
 
