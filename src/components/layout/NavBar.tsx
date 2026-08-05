@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Upload, Download } from "lucide-react";
+import { MessageSquare, Upload, Download, Library } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -14,11 +14,13 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { UploadPanel } from "@/components/documents/UploadPanel";
+import { KnowledgeBasePreview } from "@/components/documents/KnowledgeBasePreview";
 
 export function NavBar({ children, chatId }: { children?: React.ReactNode; chatId?: string | null }) {
   const pathname = usePathname();
   const [exporting, setExporting] = useState(false);
   const [docOpen, setDocOpen] = useState(false);
+  const [kbOpen, setKbOpen] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -68,6 +70,21 @@ export function NavBar({ children, chatId }: { children?: React.ReactNode; chatI
               <DialogDescription>Upload documents to the knowledge base.</DialogDescription>
             </DialogHeader>
             <UploadPanel />
+          </DialogContent>
+        </Dialog>
+        <Dialog open={kbOpen} onOpenChange={setKbOpen}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <Library className="mr-1.5 h-4 w-4" />
+              Knowledge Base
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Knowledge Base</DialogTitle>
+              <DialogDescription>当前知识库中的文档概览</DialogDescription>
+            </DialogHeader>
+            <KnowledgeBasePreview />
           </DialogContent>
         </Dialog>
         {chatId && (
