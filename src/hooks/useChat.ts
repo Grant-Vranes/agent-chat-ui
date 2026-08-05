@@ -38,6 +38,7 @@ export function useChat(): UseChatReturn {
   const pptOutlineRef = useRef<PptOutline | null>(null);
   const lastChunkTimeRef = useRef<number>(0);
   const workingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const doneReceivedRef = useRef(false);
 
   useEffect(() => {
     pptOutlineRef.current = pptOutline;
@@ -73,6 +74,7 @@ export function useChat(): UseChatReturn {
     accumulatedRef.current = "";
     setIsWorking(false);
     lastChunkTimeRef.current = Date.now();
+    doneReceivedRef.current = false;
 
     if (workingTimerRef.current) {
       clearInterval(workingTimerRef.current);
@@ -128,7 +130,7 @@ export function useChat(): UseChatReturn {
     });
 
     es.addEventListener("done", () => {
-      es.close();
+      doneReceivedRef.current = true;
       if (workingTimerRef.current) {
         clearInterval(workingTimerRef.current);
         workingTimerRef.current = null;
@@ -153,8 +155,9 @@ export function useChat(): UseChatReturn {
         clearInterval(workingTimerRef.current);
         workingTimerRef.current = null;
       }
-      setIsLoading(false);
       setIsWorking(false);
+      if (doneReceivedRef.current) return;
+      setIsLoading(false);
       const finalMessages = [...messagesRef.current];
       let session = getSession(chatId);
       if (!session) {
