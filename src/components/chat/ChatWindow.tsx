@@ -31,7 +31,7 @@ export function ChatWindow() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [overviewOpen, setOverviewOpen] = useState(true);
   const [outlineOpen, setOutlineOpen] = useState(true);
-  const [outlineWidth, setOutlineWidth] = useState(340);
+  const [outlineWidth, setOutlineWidth] = useState(420);
   const [overviewWidth, setOverviewWidth] = useState(280);
 
   const handleOutlineResize = useCallback((deltaX: number) => {
@@ -107,7 +107,7 @@ export function ChatWindow() {
         </NavBar>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-3xl px-4 py-8">
+          <div className="mx-auto w-full max-w-[1400px] px-6 py-8">
             {messages.length === 0 && !isLoading ? (
               <div className="mt-[20vh] text-center">
                 <h1 className="font-display text-4xl font-normal text-primary">
@@ -124,7 +124,7 @@ export function ChatWindow() {
         </div>
 
         <div className="border-t border-border bg-background px-4 py-4">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto w-full max-w-[1400px] px-6">
             <ChatInput onSend={sendMessage} isLoading={isLoading} onStop={stop} />
           </div>
         </div>

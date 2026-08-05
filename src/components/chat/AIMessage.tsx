@@ -195,7 +195,7 @@ export function AIMessage({ content, timestamp, messageId }: { content: string; 
         <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
           AI
         </div>
-        <div className="prose prose-sm max-w-none py-0.5 dark:prose-invert">
+        <div className="prose prose-sm max-w-[75ch] py-0.5 dark:prose-invert">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={headingComponents}>
             {preprocessMarkdown(content)}
           </ReactMarkdown>

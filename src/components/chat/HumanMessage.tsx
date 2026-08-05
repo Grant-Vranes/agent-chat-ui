@@ -34,7 +34,7 @@ export function HumanMessage({ content, timestamp }: { content: string; timestam
 
   return (
     <div className="group flex w-full flex-col items-end gap-1.5">
-      <div className="flex items-end gap-3">
+      <div className="flex w-full justify-end gap-3 items-end">
         <div className="bg-primary text-primary-foreground w-fit max-w-[80%] rounded-2xl rounded-br-sm px-4 py-3 text-sm leading-relaxed shadow-bubble whitespace-pre-wrap">
           {content}
         </div>
