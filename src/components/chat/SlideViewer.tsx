@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { PptOutline, PptSlide } from "@/lib/storage";
 import { BarChart3, List, FileText, HelpCircle, BookOpen, X, ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,119 +70,104 @@ export function SlideViewer({ outline, hasOutline, isOpen, onToggle, width = 340
   if (!hasOutline || !outline) return null;
 
   return (
-    <AnimatePresence>
+    <aside
+      className="h-full border-r border-border bg-background overflow-hidden flex-shrink-0 transition-all duration-300 ease-in-out"
+      style={{ width: isOpen ? width : 40 }}
+    >
       {isOpen ? (
-        <motion.aside
-          key="outline-open"
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="h-full border-r border-border bg-background overflow-hidden flex-shrink-0"
-        >
-          <div className="flex h-full flex-col" style={{ width }}>
-            <div className="border-b border-border px-4 py-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-foreground">
-                  PPT 大纲
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">
-                    {outline.slides.length} 页
-                  </span>
-                </h2>
-                <div className="flex items-center gap-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setExpanded((v) => !v)}
-                        className="text-muted-foreground hover:text-foreground h-7 w-7"
-                      >
-                        {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">
-                      {expanded ? "收起细节" : "展开细节"}
-                    </TooltipContent>
-                  </Tooltip>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onToggle}
-                    className="text-muted-foreground hover:text-foreground h-7 w-7"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-2 flex items-center gap-1.5">
-                <input
-                  type="number"
-                  min={1}
-                  max={outline.slides.length}
-                  value={jumpPage}
-                  onChange={(e) => {
-                    setJumpPage(e.target.value);
-                    setInputError(false);
-                  }}
-                  onKeyDown={handleJumpKeyDown}
-                  placeholder="页码"
-                  className={`h-7 w-16 rounded-md border bg-transparent px-2 text-xs outline-none transition-colors placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary/20 ${
-                    inputError
-                      ? "border-destructive focus:border-destructive"
-                      : "border-border focus:border-primary"
-                  }`}
-                />
+        <div className="flex h-full flex-col" style={{ width }}>
+          <div className="border-b border-border px-4 py-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-foreground">
+                PPT 大纲
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  {outline.slides.length} 页
+                </span>
+              </h2>
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setExpanded((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground h-7 w-7"
+                    >
+                      {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    {expanded ? "收起细节" : "展开细节"}
+                  </TooltipContent>
+                </Tooltip>
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleJump}
-                  className="h-7 gap-1 px-2 text-xs"
+                  variant="ghost"
+                  size="icon"
+                  onClick={onToggle}
+                  className="text-muted-foreground hover:text-foreground h-7 w-7"
                 >
-                  跳转
-                  <ArrowRight className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-3 py-3">
-              <TooltipProvider>
-                <div className="flex flex-col gap-2">
-                  {outline.slides.map((slide) => (
-                    <SlideCard
-                      key={slide.pageNumber}
-                      slide={slide}
-                      expanded={expanded}
-                      highlighted={highlightPage === slide.pageNumber}
-                    />
-                  ))}
-                </div>
-              </TooltipProvider>
+            <div className="mt-2 flex items-center gap-1.5">
+              <input
+                type="number"
+                min={1}
+                max={outline.slides.length}
+                value={jumpPage}
+                onChange={(e) => {
+                  setJumpPage(e.target.value);
+                  setInputError(false);
+                }}
+                onKeyDown={handleJumpKeyDown}
+                placeholder="页码"
+                className={`h-7 w-16 rounded-md border bg-transparent px-2 text-xs outline-none transition-colors placeholder:text-muted-foreground/60 focus:ring-2 focus:ring-primary/20 ${
+                  inputError
+                    ? "border-destructive focus:border-destructive"
+                    : "border-border focus:border-primary"
+                }`}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleJump}
+                className="h-7 gap-1 px-2 text-xs"
+              >
+                跳转
+                <ArrowRight className="h-3 w-3" />
+              </Button>
             </div>
           </div>
-        </motion.aside>
-      ) : (
-        <motion.aside
-          key="outline-closed"
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 40, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="h-full border-r border-border bg-background flex-shrink-0"
-        >
-          <div className="flex h-full w-[40px] flex-col items-center pt-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onToggle}
-              className="text-muted-foreground hover:text-foreground"
-              aria-label="Open PPT outline"
-            >
-              <FileText className="h-4 w-4" />
-            </Button>
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-3 py-3">
+            <TooltipProvider>
+              <div className="flex flex-col gap-2">
+                {outline.slides.map((slide) => (
+                  <SlideCard
+                    key={slide.pageNumber}
+                    slide={slide}
+                    expanded={expanded}
+                    highlighted={highlightPage === slide.pageNumber}
+                  />
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
-        </motion.aside>
+        </div>
+      ) : (
+        <div className="flex h-full w-[40px] flex-col items-center pt-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggle}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Open PPT outline"
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
+        </div>
       )}
-    </AnimatePresence>
+    </aside>
   );
 }
 
