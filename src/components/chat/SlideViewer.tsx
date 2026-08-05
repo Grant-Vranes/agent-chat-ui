@@ -36,6 +36,7 @@ const contentTypeLabel: Record<string, string> = {
 };
 
 export function SlideViewer({ outline, hasOutline, isOpen, onToggle, width = 340 }: SlideViewerProps) {
+  console.log("[SlideViewer] hasOutline:", hasOutline, "outline:", outline?.slides?.length, "slides", "isOpen:", isOpen);
   const [expanded, setExpanded] = useState(false);
   const [jumpPage, setJumpPage] = useState("");
   const [highlightPage, setHighlightPage] = useState<number | null>(null);

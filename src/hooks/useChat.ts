@@ -121,6 +121,7 @@ export function useChat(): UseChatReturn {
     es.addEventListener("ppt-outline", (event: MessageEvent) => {
       try {
         const outline: PptOutline = JSON.parse(event.data);
+        console.log("[ppt-outline] received slides:", outline.slides?.length);
         setPptOutline(outline);
         setHasOutline(true);
         pptOutlineRef.current = outline;
