@@ -11,6 +11,7 @@ export interface PptSlide {
   subtitle?: string
   bullets: string[]
   contentType: "cover" | "toc" | "text" | "text+chart" | "text+list" | "qa" | "ending"
+  content?: string
 }
 
 export interface PptOutline {

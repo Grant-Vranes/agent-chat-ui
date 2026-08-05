@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useChat } from "@/hooks/useChat";
 import { ChatHistory } from "./ChatHistory";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { ConversationOverview } from "./ConversationOverview";
 import { SlideViewer } from "./SlideViewer";
+import { ResizableHandle } from "@/components/ui/resizable-handle";
 import { Button } from "@/components/ui/button";
 import { MessageSquarePlus, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,7 +29,18 @@ export function ChatWindow() {
   } = useChat();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [overviewOpen, setOverviewOpen] = useState(false);
+  const [overviewOpen, setOverviewOpen] = useState(true);
+  const [outlineOpen, setOutlineOpen] = useState(true);
+  const [outlineWidth, setOutlineWidth] = useState(340);
+  const [overviewWidth, setOverviewWidth] = useState(280);
+
+  const handleOutlineResize = useCallback((deltaX: number) => {
+    setOutlineWidth((prev) => Math.max(200, Math.min(500, prev + deltaX)));
+  }, []);
+
+  const handleOverviewResize = useCallback((deltaX: number) => {
+    setOverviewWidth((prev) => Math.max(200, Math.min(450, prev - deltaX)));
+  }, []);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
@@ -65,7 +77,17 @@ export function ChatWindow() {
         )}
       </AnimatePresence>
 
-      <SlideViewer outline={pptOutline} hasOutline={hasOutline} />
+      <SlideViewer
+        outline={pptOutline}
+        hasOutline={hasOutline}
+        isOpen={outlineOpen}
+        onToggle={() => setOutlineOpen((v) => !v)}
+        width={outlineWidth}
+      />
+
+      {hasOutline && outlineOpen && (
+        <ResizableHandle onResize={handleOutlineResize} />
+      )}
 
       <div className="flex flex-1 flex-col min-w-0">
         <NavBar chatId={currentChatId}>
@@ -108,10 +130,15 @@ export function ChatWindow() {
         </div>
       </div>
 
+      {overviewOpen && (
+        <ResizableHandle onResize={handleOverviewResize} />
+      )}
+
       <ConversationOverview
         messages={messages}
         isOpen={overviewOpen}
         onToggle={() => setOverviewOpen((v) => !v)}
+        width={overviewWidth}
       />
     </div>
   );

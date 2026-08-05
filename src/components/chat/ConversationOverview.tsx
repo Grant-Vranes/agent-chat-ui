@@ -11,10 +11,12 @@ export function ConversationOverview({
   messages,
   isOpen,
   onToggle,
+  width = 280,
 }: {
   messages: ChatMessage[];
   isOpen: boolean;
   onToggle: () => void;
+  width?: number;
 }) {
   const groups = useMemo(() => getRoundGroups(messages), [messages]);
 
@@ -31,12 +33,12 @@ export function ConversationOverview({
         <motion.aside
           key="overview-open"
           initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 280, opacity: 1 }}
+          animate={{ width, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="h-full border-l border-border bg-background overflow-hidden flex-shrink-0"
         >
-          <div className="flex h-full w-[280px] flex-col">
+          <div className="flex h-full flex-col" style={{ width }}>
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <h2 className="text-sm font-semibold text-foreground">Overview</h2>
               <Button
