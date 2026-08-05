@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { ChatMessage, ChatSession, getSessions, getSession, saveSession, deleteSession as deleteStorageSession, createSession } from "@/lib/storage";
+import { ChatMessage, ChatSession, getSessions, getSession, saveSession, deleteSession as deleteStorageSession, createSession, PptOutline } from "@/lib/storage";
 
 export interface UseChatReturn {
   messages: ChatMessage[];
@@ -13,6 +13,8 @@ export interface UseChatReturn {
   sessions: ChatSession[];
   newSession: () => void;
   removeSession: (id: string) => void;
+  pptOutline: PptOutline | null;
+  hasOutline: boolean;
 }
 
 export function useChat(): UseChatReturn {
@@ -26,9 +28,21 @@ export function useChat(): UseChatReturn {
   const chatIdRef = useRef<string | null>(null);
   const messagesRef = useRef<ChatMessage[]>([]);
 
+  const [pptOutline, setPptOutline] = useState<PptOutline | null>(null);
+  const [hasOutline, setHasOutline] = useState(false);
+  const pptOutlineRef = useRef<PptOutline | null>(null);
+
+  useEffect(() => {
+    pptOutlineRef.current = pptOutline;
+  }, [pptOutline]);
+
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    setSessions(getSessions());
+  }, []);
 
   const refreshSessions = useCallback(() => {
     setSessions(getSessions());
@@ -77,24 +91,27 @@ export function useChat(): UseChatReturn {
       }
     };
 
+    es.addEventListener("ppt-outline", (event: MessageEvent) => {
+      try {
+        const outline: PptOutline = JSON.parse(event.data);
+        setPptOutline(outline);
+        setHasOutline(true);
+        pptOutlineRef.current = outline;
+      } catch (e) {
+        console.error("Failed to parse ppt-outline event", e);
+      }
+    });
+
     es.onerror = () => {
       es.close();
       setIsLoading(false);
-      const finalMessages = [...messagesRef.current, userMsg];
-      const finalContent = accumulatedRef.current;
-      if (finalContent) {
-        finalMessages.push({
-          id: uuidv4(),
-          role: "assistant",
-          content: finalContent,
-          timestamp: Date.now(),
-        });
-      }
+      const finalMessages = [...messagesRef.current];
       let session = getSession(chatId);
       if (!session) {
         session = createSession(chatId, content);
       }
       session.messages = finalMessages;
+      session.pptOutline = pptOutlineRef.current;
       session.updatedAt = Date.now();
       saveSession(session);
       refreshSessions();
@@ -110,13 +127,24 @@ export function useChat(): UseChatReturn {
     chatIdRef.current = chatId;
     setCurrentChatId(chatId);
     const session = getSession(chatId);
-    setMessages(session?.messages || []);
+    const loaded = session?.messages || [];
+    const seen = new Set<string>();
+    const deduped = loaded.filter((m) => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+    setMessages(deduped);
+    setPptOutline(session?.pptOutline || null);
+    setHasOutline(!!session?.pptOutline);
   }, []);
 
   const newSession = useCallback(() => {
     chatIdRef.current = null;
     setCurrentChatId(null);
     setMessages([]);
+    setPptOutline(null);
+    setHasOutline(false);
     setError(null);
   }, []);
 
@@ -139,5 +167,7 @@ export function useChat(): UseChatReturn {
     sessions,
     newSession,
     removeSession,
+    pptOutline,
+    hasOutline,
   };
 }

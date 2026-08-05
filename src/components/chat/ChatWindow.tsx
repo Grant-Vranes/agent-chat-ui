@@ -6,6 +6,7 @@ import { ChatHistory } from "./ChatHistory";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { ConversationOverview } from "./ConversationOverview";
+import { SlideViewer } from "./SlideViewer";
 import { Button } from "@/components/ui/button";
 import { MessageSquarePlus, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,6 +23,8 @@ export function ChatWindow() {
     sessions,
     newSession,
     removeSession,
+    pptOutline,
+    hasOutline,
   } = useChat();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -61,6 +64,8 @@ export function ChatWindow() {
           </motion.aside>
         )}
       </AnimatePresence>
+
+      <SlideViewer outline={pptOutline} hasOutline={hasOutline} />
 
       <div className="flex flex-1 flex-col min-w-0">
         <NavBar chatId={currentChatId}>

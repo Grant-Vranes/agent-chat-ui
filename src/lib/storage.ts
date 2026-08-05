@@ -5,12 +5,25 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+export interface PptSlide {
+  pageNumber: number
+  title: string
+  subtitle?: string
+  bullets: string[]
+  contentType: "cover" | "toc" | "text" | "text+chart" | "text+list" | "qa" | "ending"
+}
+
+export interface PptOutline {
+  slides: PptSlide[]
+}
+
 export interface ChatSession {
   id: string;
   title: string;
   messages: ChatMessage[];
   createdAt: number;
   updatedAt: number;
+  pptOutline?: PptOutline | null;
 }
 
 const SESSIONS_KEY = "chat:sessions";
