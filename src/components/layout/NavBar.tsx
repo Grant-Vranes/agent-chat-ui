@@ -79,7 +79,7 @@ export function NavBar({ children, chatId }: { children?: React.ReactNode; chatI
               Knowledge Base
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Knowledge Base</DialogTitle>
               <DialogDescription>当前知识库中的文档概览</DialogDescription>

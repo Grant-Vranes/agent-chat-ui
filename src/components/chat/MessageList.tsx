@@ -64,7 +64,7 @@ export function MessageList({
         >
           <div className="flex items-center gap-2.5 rounded-2xl bg-secondary px-4 py-3">
             <div className="h-2 w-2 animate-pulse rounded-full bg-primary/60" />
-            <span className="text-xs text-muted-foreground">正在生成 PPT，请稍候…</span>
+            <span className="text-xs text-muted-foreground">正在思考处理中，请稍候…</span>
           </div>
         </motion.div>
       )}
