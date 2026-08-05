@@ -132,7 +132,7 @@ export function KnowledgeBasePreview() {
             {keywords.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {keywords.map((kw, i) => (
-                  <Badge key={i} variant="outline" className="text-xs">
+                  <Badge key={`${kw}-${i}`} variant="outline" className="text-xs">
                     {kw}
                   </Badge>
                 ))}
