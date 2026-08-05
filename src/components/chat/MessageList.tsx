@@ -10,10 +10,12 @@ export function MessageList({
   messages,
   isLoading,
   stopped,
+  isWorking,
 }: {
   messages: ChatMessage[];
   isLoading: boolean;
   stopped: boolean;
+  isWorking: boolean;
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -51,6 +53,18 @@ export function MessageList({
             <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
             <span className="text-[11px] text-muted-foreground/60">Response interrupted</span>
             <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+          </div>
+        </motion.div>
+      )}
+      {isLoading && isWorking && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mr-auto flex items-center gap-2.5"
+        >
+          <div className="flex items-center gap-2.5 rounded-2xl bg-secondary px-4 py-3">
+            <div className="h-2 w-2 animate-pulse rounded-full bg-primary/60" />
+            <span className="text-xs text-muted-foreground">正在生成 PPT，请稍候…</span>
           </div>
         </motion.div>
       )}

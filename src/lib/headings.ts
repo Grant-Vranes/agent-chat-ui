@@ -20,23 +20,23 @@ export interface RoundGroup {
   children: OverviewItem[];
 }
 
-function headingId(msgId: string, text: string): string {
-  const slug = text
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-]/g, "");
-  return `heading-${msgId}-${slug}`;
-}
-
 export function extractHeadings(content: string, msgId: string): HeadingItem[] {
   const items: HeadingItem[] = [];
   const regex = /^(#{2,3})\s+(.+)$/gm;
+  const slugCount = new Map<string, number>();
   let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
     const level = match[1].length as 2 | 3;
     const text = match[2].trim();
+    const baseSlug = text
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-]/g, "");
+    const count = slugCount.get(baseSlug) ?? 0;
+    slugCount.set(baseSlug, count + 1);
+    const id = count === 0 ? `heading-${msgId}-${baseSlug}` : `heading-${msgId}-${baseSlug}-${count}`;
     items.push({
-      id: headingId(msgId, text),
+      id,
       text,
       level,
       msgId,

@@ -18,6 +18,7 @@ export function ChatWindow() {
     messages,
     isLoading,
     stopped,
+    isWorking,
     sendMessage,
     stop,
     loadSession,
@@ -122,7 +123,7 @@ export function ChatWindow() {
                 </p>
               </div>
             ) : null}
-            <MessageList messages={messages} isLoading={isLoading} stopped={stopped} />
+            <MessageList messages={messages} isLoading={isLoading} stopped={stopped} isWorking={isWorking} />
           </div>
         </div>
 

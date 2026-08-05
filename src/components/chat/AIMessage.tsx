@@ -15,12 +15,25 @@ function extractHeadingText(children: React.ReactNode): string {
   return text.trim();
 }
 
-function headingId(msgId: string, text: string): string {
-  const slug = text
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-]/g, "");
-  return `heading-${msgId}-${slug}`;
+function useHeadingIds(messageId: string, content: string) {
+  return useMemo(() => {
+    const regex = /^(#{2,3})\s+(.+)$/gm;
+    const slugCount = new Map<string, number>();
+    const ids = new Map<string, string>();
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(content)) !== null) {
+      const text = match[2].trim();
+      const baseSlug = text
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-]/g, "");
+      const count = slugCount.get(baseSlug) ?? 0;
+      slugCount.set(baseSlug, count + 1);
+      const id = count === 0 ? `heading-${messageId}-${baseSlug}` : `heading-${messageId}-${baseSlug}-${count}`;
+      ids.set(text, id);
+    }
+    return ids;
+  }, [messageId, content]);
 }
 
 function preprocessMarkdown(raw: string): string {
@@ -156,19 +169,21 @@ function formatTime(ts: number): string {
 export function AIMessage({ content, timestamp, messageId }: { content: string; timestamp: number; messageId: string }) {
   const [copied, setCopied] = useState(false);
 
+  const headingIds = useHeadingIds(messageId, content);
+
   const headingComponents = useMemo<Components>(() => ({
     ...components,
     h2: ({ children, ...props }) => {
       const text = extractHeadingText(children);
-      const id = text ? headingId(messageId, text) : undefined;
+      const id = text ? headingIds.get(text) : undefined;
       return <h2 id={id} className="scroll-mt-20" {...props}>{children}</h2>;
     },
     h3: ({ children, ...props }) => {
       const text = extractHeadingText(children);
-      const id = text ? headingId(messageId, text) : undefined;
+      const id = text ? headingIds.get(text) : undefined;
       return <h3 id={id} className="scroll-mt-20" {...props}>{children}</h3>;
     },
-  }), [messageId]);
+  }), [headingIds]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(content).then(() => {

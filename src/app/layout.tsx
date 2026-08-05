@@ -22,6 +22,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Logistics Consultant",
   description: "AI-powered logistics proposal analyst",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

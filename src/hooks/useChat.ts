@@ -7,6 +7,7 @@ export interface UseChatReturn {
   isLoading: boolean;
   stopped: boolean;
   error: string | null;
+  isWorking: boolean;
   sendMessage: (content: string) => void;
   stop: () => void;
   loadSession: (chatId: string) => void;
@@ -33,7 +34,10 @@ export function useChat(): UseChatReturn {
   const [pptOutline, setPptOutline] = useState<PptOutline | null>(null);
   const [hasOutline, setHasOutline] = useState(false);
   const [stopped, setStopped] = useState(false);
+  const [isWorking, setIsWorking] = useState(false);
   const pptOutlineRef = useRef<PptOutline | null>(null);
+  const lastChunkTimeRef = useRef<number>(0);
+  const workingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     pptOutlineRef.current = pptOutline;
@@ -67,6 +71,17 @@ export function useChat(): UseChatReturn {
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
     accumulatedRef.current = "";
+    setIsWorking(false);
+    lastChunkTimeRef.current = Date.now();
+
+    if (workingTimerRef.current) {
+      clearInterval(workingTimerRef.current);
+    }
+    workingTimerRef.current = setInterval(() => {
+      if (Date.now() - lastChunkTimeRef.current > 5000) {
+        setIsWorking(true);
+      }
+    }, 2000);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     const url = `${apiUrl}/api/logistics/chat/sse?message=${encodeURIComponent(content)}&chatId=${encodeURIComponent(chatId)}`;
@@ -76,6 +91,8 @@ export function useChat(): UseChatReturn {
 
     es.onmessage = (event) => {
       if (event.data) {
+        lastChunkTimeRef.current = Date.now();
+        setIsWorking(false);
         accumulatedRef.current += event.data;
         setMessages((prev) => {
           const updated = [...prev];
@@ -95,6 +112,10 @@ export function useChat(): UseChatReturn {
       }
     };
 
+    es.addEventListener("heartbeat", () => {
+      // 心跳保活事件，忽略即可，不需要任何处理
+    });
+
     es.addEventListener("ppt-outline", (event: MessageEvent) => {
       try {
         const outline: PptOutline = JSON.parse(event.data);
@@ -106,9 +127,34 @@ export function useChat(): UseChatReturn {
       }
     });
 
+    es.addEventListener("done", () => {
+      es.close();
+      if (workingTimerRef.current) {
+        clearInterval(workingTimerRef.current);
+        workingTimerRef.current = null;
+      }
+      setIsLoading(false);
+      setIsWorking(false);
+      const finalMessages = [...messagesRef.current];
+      let session = getSession(chatId);
+      if (!session) {
+        session = createSession(chatId, content);
+      }
+      session.messages = finalMessages;
+      session.pptOutline = pptOutlineRef.current;
+      session.updatedAt = Date.now();
+      saveSession(session);
+      refreshSessions();
+    });
+
     es.onerror = () => {
       es.close();
+      if (workingTimerRef.current) {
+        clearInterval(workingTimerRef.current);
+        workingTimerRef.current = null;
+      }
       setIsLoading(false);
+      setIsWorking(false);
       const finalMessages = [...messagesRef.current];
       let session = getSession(chatId);
       if (!session) {
@@ -124,7 +170,12 @@ export function useChat(): UseChatReturn {
 
   const stop = useCallback(() => {
     eventSourceRef.current?.close();
+    if (workingTimerRef.current) {
+      clearInterval(workingTimerRef.current);
+      workingTimerRef.current = null;
+    }
     setIsLoading(false);
+    setIsWorking(false);
     setStopped(true);
   }, []);
 
@@ -170,6 +221,7 @@ export function useChat(): UseChatReturn {
     messages,
     isLoading,
     stopped,
+    isWorking,
     error,
     sendMessage,
     stop,
