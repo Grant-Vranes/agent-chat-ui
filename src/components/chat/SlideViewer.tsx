@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PptOutline, PptSlide } from "@/lib/storage";
 import { BarChart3, List, FileText, HelpCircle, BookOpen, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 interface SlideViewerProps {
   outline: PptOutline | null
@@ -21,6 +22,16 @@ const contentTypeIcon: Record<string, React.ReactNode> = {
   "text+list": <List className="h-4 w-4" />,
   "qa": <HelpCircle className="h-4 w-4" />,
   "ending": <BookOpen className="h-4 w-4" />,
+};
+
+const contentTypeLabel: Record<string, string> = {
+  "cover": "Cover",
+  "toc": "Table of Contents",
+  "text": "Text",
+  "text+chart": "Text & Chart",
+  "text+list": "Text & List",
+  "qa": "Q&A",
+  "ending": "Ending",
 };
 
 export function SlideViewer({ outline, hasOutline, isOpen, onToggle, width = 340 }: SlideViewerProps) {
@@ -55,11 +66,13 @@ export function SlideViewer({ outline, hasOutline, isOpen, onToggle, width = 340
               </Button>
             </div>
             <div className="flex-1 overflow-y-auto px-3 py-3">
-              <div className="flex flex-col gap-2">
-                {outline.slides.map((slide) => (
-                  <SlideCard key={slide.pageNumber} slide={slide} />
-                ))}
-              </div>
+              <TooltipProvider>
+                <div className="flex flex-col gap-2">
+                  {outline.slides.map((slide) => (
+                    <SlideCard key={slide.pageNumber} slide={slide} />
+                  ))}
+                </div>
+              </TooltipProvider>
             </div>
           </div>
         </motion.aside>
@@ -99,9 +112,16 @@ function SlideCard({ slide }: { slide: PptSlide }) {
         <span className="flex-1 text-xs font-semibold text-card-foreground leading-snug">
           {slide.title}
         </span>
-        <span className="shrink-0 text-muted-foreground">
-          {contentTypeIcon[slide.contentType] || <FileText className="h-3 w-3" />}
-        </span>
+        <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="shrink-0 text-muted-foreground cursor-help">
+                {contentTypeIcon[slide.contentType] || <FileText className="h-3 w-3" />}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              {contentTypeLabel[slide.contentType] || slide.contentType}
+            </TooltipContent>
+          </Tooltip>
       </div>
       {slide.content ? (
         <div className="text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap">
